@@ -1,0 +1,307 @@
+@startuml B2B_Confeitaria_ClassDiagram
+
+skinparam classAttributeIconSize 0
+skinparam classFontStyle Bold
+skinparam backgroundColor #FAFAFA
+skinparam class {
+  BackgroundColor #FFF8F0
+  BorderColor #C0784A
+  HeaderBackgroundColor #C0784A
+  HeaderFontColor #FFFFFF
+  ArrowColor #7B4F2E
+}
+skinparam stereotypeCBackgroundColor #F5DEB3
+skinparam noteBorderColor #C0784A
+
+' =====================
+' ENUMS
+' =====================
+
+enum RoleTipo {
+  GERENTE
+  PADEIRO
+  OPERADOR_ESTOQUE
+  VENDEDOR
+  COMPRADOR
+  ADMINISTRADOR
+}
+
+enum StatusPedido {
+  PENDENTE
+  CONFIRMADO
+  EM_PRODUCAO
+  PRONTO
+  DESPACHADO
+  ENTREGUE
+  CANCELADO
+}
+
+enum CategoriaItem {
+  BOLO
+  DOCE
+  SALGADO
+  BEBIDA
+  EMBALAGEM
+  OUTRO
+}
+
+' =====================
+' ROLE PATTERN
+' =====================
+
+interface IRole {
+  + getTipo(): RoleTipo
+  + getPermissoes(): List<String>
+  + podeExecutar(acao: String): Boolean
+}
+
+abstract class Role implements IRole {
+  # tipo: RoleTipo
+  # permissoes: List<String>
+  + getTipo(): RoleTipo
+  + getPermissoes(): List<String>
+  + podeExecutar(acao: String): Boolean
+}
+
+class RoleGerente extends Role {
+  + aprovarPedido(pedido: Pedido): void
+  + gerarRelatorio(): Relatorio
+  + gerenciarFuncionarios(): void
+}
+
+class RolePadeiro extends Role {
+  + registrarProducao(item: ItemCatalogo, qtd: int): void
+  + atualizarStatusProducao(pedido: Pedido): void
+  + consultarReceitas(): List<String>
+}
+
+class RoleOperadorEstoque extends Role {
+  + atualizarEstoque(item: ItemCatalogo, qtd: int): void
+  + conferirEntrada(notaFiscal: NotaFiscal): void
+  + gerarAlertaEstoque(): void
+}
+
+class RoleVendedor extends Role {
+  + cadastrarItemCatalogo(item: ItemCatalogo): void
+  + responderCotacao(cotacao: Cotacao): void
+  + consultarPedidos(): List<Pedido>
+}
+
+class RoleComprador extends Role {
+  + realizarPedido(pedido: Pedido): void
+  + solicitarCotacao(cotacao: Cotacao): void
+  + consultarCatalogo(): List<ItemCatalogo>
+}
+
+class RoleAdministrador extends Role {
+  + gerenciarEmpresas(): void
+  + configurarSistema(): void
+  + gerenciarUsuarios(): void
+}
+
+' =====================
+' USUÁRIO
+' =====================
+
+class Usuario {
+  - id: UUID
+  - nome: String
+  - email: String
+  - senhaHash: String
+  - ativo: Boolean
+  - dataCriacao: Date
+  + autenticar(senha: String): Boolean
+  + atribuirRole(role: Role): void
+  + removerRole(role: Role): void
+  + getRoles(): List<Role>
+}
+
+' =====================
+' EMPRESA
+' =====================
+
+abstract class Empresa {
+  - id: UUID
+  - razaoSocial: String
+  - cnpj: String
+  - email: String
+  - telefone: String
+  - endereco: Endereco
+  - ativo: Boolean
+  + cadastrar(): void
+  + atualizar(): void
+  + validarCNPJ(): Boolean
+}
+
+class EmpresaFornecedora extends Empresa {
+  - catalogo: List<ItemCatalogo>
+  - capacidadeProducao: int
+  + adicionarItemCatalogo(item: ItemCatalogo): void
+  + removerItemCatalogo(item: ItemCatalogo): void
+  + consultarPedidosRecebidos(): List<Pedido>
+  + atualizarCapacidade(capacidade: int): void
+}
+
+class EmpresaCompradora extends Empresa {
+  - limiteCredito: Double
+  - historicoCompras: List<Pedido>
+  + realizarPedido(pedido: Pedido): void
+  + consultarHistoricoCompras(): List<Pedido>
+  + solicitarCotacao(itens: List<ItemPedido>): Cotacao
+  + consultarLimiteCredito(): Double
+}
+
+' =====================
+' CATÁLOGO / PRODUTO
+' =====================
+
+class ItemCatalogo {
+  - id: UUID
+  - nome: String
+  - descricao: String
+  - categoria: CategoriaItem
+  - precoUnitario: Double
+  - unidadeMedida: String
+  - estoqueDisponivel: int
+  - estoqueMinimo: int
+  - ativo: Boolean
+  + atualizar(): void
+  + verificarDisponibilidade(qtd: int): Boolean
+  + calcularPrecoTotal(qtd: int): Double
+}
+
+class Estoque {
+  - id: UUID
+  - quantidadeAtual: int
+  - ultimaAtualizacao: Date
+  + atualizar(qtd: int): void
+  + reservar(qtd: int): Boolean
+  + liberarReserva(qtd: int): void
+  + verificarMinimo(): Boolean
+}
+
+' =====================
+' PEDIDO
+' =====================
+
+class Pedido {
+  - id: UUID
+  - numeroPedido: String
+  - dataCriacao: Date
+  - dataEntregaPrevista: Date
+  - status: StatusPedido
+  - valorTotal: Double
+  - observacoes: String
+  + confirmar(): void
+  + cancelar(): void
+  + calcularTotal(): Double
+  + atualizarStatus(status: StatusPedido): void
+}
+
+class ItemPedido {
+  - id: UUID
+  - quantidade: int
+  - precoUnitario: Double
+  - subtotal: Double
+  + calcularSubtotal(): Double
+}
+
+' =====================
+' COTAÇÃO
+' =====================
+
+class Cotacao {
+  - id: UUID
+  - dataSolicitacao: Date
+  - dataResposta: Date
+  - validade: Date
+  - status: String
+  - observacoes: String
+  + responder(): void
+  + aprovar(): Pedido
+  + recusar(): void
+  + estaValida(): Boolean
+}
+
+' =====================
+' NOTA FISCAL
+' =====================
+
+class NotaFiscal {
+  - id: UUID
+  - numero: String
+  - dataEmissao: Date
+  - valorTotal: Double
+  - impostos: Double
+  + emitir(): void
+  + cancelar(): void
+}
+
+' =====================
+' ENDEREÇO
+' =====================
+
+class Endereco {
+  - logradouro: String
+  - numero: String
+  - complemento: String
+  - bairro: String
+  - cidade: String
+  - estado: String
+  - cep: String
+}
+
+' =====================
+' RELATÓRIO
+' =====================
+
+class Relatorio {
+  - id: UUID
+  - titulo: String
+  - dataGeracao: Date
+  - periodo: String
+  - conteudo: String
+  + gerar(): void
+  + exportarPDF(): void
+}
+
+' =====================
+' RELACIONAMENTOS
+' =====================
+
+' Role Pattern
+Usuario "1" o-- "1..*" Role : possui >
+
+' Empresa e Usuário
+Empresa "1" *-- "1..*" Usuario : emprega >
+EmpresaFornecedora ..> RoleGerente
+EmpresaFornecedora ..> RolePadeiro
+EmpresaFornecedora ..> RoleOperadorEstoque
+EmpresaFornecedora ..> RoleVendedor
+EmpresaCompradora ..> RoleComprador
+EmpresaCompradora ..> RoleAdministrador
+
+' Catálogo e Estoque
+EmpresaFornecedora "1" *-- "0..*" ItemCatalogo : gerencia >
+ItemCatalogo "1" *-- "1" Estoque : controla >
+
+' Pedido
+EmpresaCompradora "1" -- "0..*" Pedido : realiza >
+EmpresaFornecedora "1" -- "0..*" Pedido : recebe >
+Pedido "1" *-- "1..*" ItemPedido : contém >
+ItemPedido "0..*" --> "1" ItemCatalogo : referencia >
+Pedido "1" -- "0..1" NotaFiscal : gera >
+Pedido "1" -- "1" Cotacao : originado de >
+
+' Cotação
+EmpresaCompradora "1" -- "0..*" Cotacao : solicita >
+EmpresaFornecedora "1" -- "0..*" Cotacao : responde >
+Cotacao "1" *-- "1..*" ItemPedido : itens >
+
+' Endereço
+Empresa "1" *-- "1" Endereco : possui >
+
+' Relatório
+RoleGerente ..> Relatorio : gera >
+
+@enduml

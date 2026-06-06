@@ -1,6 +1,8 @@
 package com.projetoconfeitaria.project.Model;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,13 +18,13 @@ public class Produto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private UUID id;
 
     @ManyToMany(mappedBy = "itemPedido")
     private List<Pedidos> pedidos;
     private String name;
-    private int dataFabricado;
-    private int validade;
+    private LocalDate dataFabricado;
+    private LocalDate validade;
 
     
 
