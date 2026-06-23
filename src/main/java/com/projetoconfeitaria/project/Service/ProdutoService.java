@@ -1,4 +1,4 @@
-package com.projetoconfeitaria.project.Service;
+package com.projetoconfeitaria.project.service;
 
 public class ProdutoService {
     

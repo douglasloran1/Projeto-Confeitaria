@@ -1,4 +1,4 @@
-package com.projetoconfeitaria.project.Model;
+package com.projetoconfeitaria.project.model;
 
 import java.util.List;
 import java.util.UUID;
