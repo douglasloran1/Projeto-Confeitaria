@@ -25,7 +25,7 @@ public class PedidoService {
 
     public Pedido buscarPorId(UUID id) {
         return pedidoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado."));
+                .orElseThrow(() -> new RuntimeException("Pedido nao encontrado."));
     }
 
     public List<Pedido> listarTodos() {
