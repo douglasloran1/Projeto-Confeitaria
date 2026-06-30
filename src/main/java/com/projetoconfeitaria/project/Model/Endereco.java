@@ -1,6 +1,11 @@
 package com.projetoconfeitaria.project.model;
 
+import java.util.UUID;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
@@ -13,6 +18,11 @@ public class Endereco {
     private String cidade;
     private String estado;
     private String cep;
+
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private UUID id;
 
     public Endereco(){
 

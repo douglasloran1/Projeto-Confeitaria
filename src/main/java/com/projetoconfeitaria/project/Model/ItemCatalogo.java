@@ -1,8 +1,19 @@
-package com.projetoconfeitaria.project.model;
-import jakarta.persistence.*;
+package com.projetoconfeitaria.project.model;   
 import java.util.UUID;
 
 import com.projetoconfeitaria.project.enuns.CategoriaItem;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;  
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "item_catalogo")
