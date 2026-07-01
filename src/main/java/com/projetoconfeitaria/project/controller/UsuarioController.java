@@ -1,11 +1,12 @@
 package com.projetoconfeitaria.project.controller;
 
+import com.projetoconfeitaria.project.enuns.Role;
 import com.projetoconfeitaria.project.model.Usuario;
+import com.projetoconfeitaria.project.security.RequireRole;
 import com.projetoconfeitaria.project.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -20,16 +21,19 @@ public class UsuarioController {
     }
 
     @PostMapping
+    @RequireRole(Role.ADMIN)
     public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario) {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.cadastrar(usuario));
     }
 
     @GetMapping
+    @RequireRole(Role.ADMIN)
     public ResponseEntity<List<Usuario>> listarTodos() {
         return ResponseEntity.ok(usuarioService.listarTodos());
     }
 
     @GetMapping("/ativos")
+    @RequireRole(Role.ADMIN)
     public ResponseEntity<List<Usuario>> listarAtivos() {
         return ResponseEntity.ok(usuarioService.listarAtivos());
     }
@@ -45,17 +49,26 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
+    @RequireRole(Role.ADMIN)
     public ResponseEntity<Usuario> atualizar(@PathVariable UUID id, @RequestBody Usuario usuario) {
         return ResponseEntity.ok(usuarioService.atualizar(id, usuario));
     }
 
+    @PatchMapping("/{id}/role")
+    @RequireRole(Role.ADMIN)
+    public ResponseEntity<Usuario> atualizarRole(@PathVariable UUID id, @RequestParam Role role) {
+        return ResponseEntity.ok(usuarioService.atualizarRole(id, role));
+    }
+
     @PatchMapping("/{id}/desativar")
+    @RequireRole(Role.ADMIN)
     public ResponseEntity<Void> desativar(@PathVariable UUID id) {
         usuarioService.desativar(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/reativar")
+    @RequireRole(Role.ADMIN)
     public ResponseEntity<Void> reativar(@PathVariable UUID id) {
         usuarioService.reativar(id);
         return ResponseEntity.noContent().build();

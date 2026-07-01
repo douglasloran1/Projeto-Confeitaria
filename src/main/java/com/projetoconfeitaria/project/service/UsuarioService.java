@@ -1,9 +1,9 @@
 package com.projetoconfeitaria.project.service;
 
+import com.projetoconfeitaria.project.enuns.Role;
 import com.projetoconfeitaria.project.model.Usuario;
 import com.projetoconfeitaria.project.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -17,9 +17,9 @@ public class UsuarioService {
     }
 
     public Usuario cadastrar(Usuario usuario) {
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
+        if (usuarioRepository.existsByEmail(usuario.getEmail()))
             throw new RuntimeException("Já existe um usuário cadastrado com este e-mail.");
-        }
+        if (usuario.getRole() == null) usuario.setRole(Role.FUNCIONARIO);
         usuario.setAtivo(true);
         return usuarioRepository.save(usuario);
     }
@@ -34,18 +34,19 @@ public class UsuarioService {
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
     }
 
-    public List<Usuario> listarTodos() {
-        return usuarioRepository.findAll();
-    }
-
-    public List<Usuario> listarAtivos() {
-        return usuarioRepository.findByAtivo(true);
-    }
+    public List<Usuario> listarTodos() { return usuarioRepository.findAll(); }
+    public List<Usuario> listarAtivos() { return usuarioRepository.findByAtivo(true); }
 
     public Usuario atualizar(UUID id, Usuario dadosAtualizados) {
         Usuario usuario = buscarPorId(id);
         usuario.setNome(dadosAtualizados.getNome());
         usuario.setTelefone(dadosAtualizados.getTelefone());
+        return usuarioRepository.save(usuario);
+    }
+
+    public Usuario atualizarRole(UUID id, Role novaRole) {
+        Usuario usuario = buscarPorId(id);
+        usuario.setRole(novaRole);
         return usuarioRepository.save(usuario);
     }
 
